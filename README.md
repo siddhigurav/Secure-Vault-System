@@ -1,6 +1,6 @@
 # Secure Vault System
 
-A production-grade secure vault system for managing sensitive company metadata using Python and FastAPI.
+A production-grade secure vault system for managing sensitive company metadata using Python FastAPI backend and vanilla HTML/CSS/JavaScript frontend.
 
 ## Architecture
 
@@ -60,32 +60,29 @@ The system follows clean architecture principles with strict separation of conce
 - **Storage vs Auditability**: Full audit logs increase storage needs.
 - **Usability vs Security**: Masked secrets require explicit reveal actions.
 
-## Setup
+## Quick Start (Backend + Frontend)
 
-1. Install dependencies:
+1. Install backend dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-2. Set environment variables in `.env`:
-   - `DATABASE_URL`: PostgreSQL connection string
-   - `SECRET_KEY`: JWT signing key (32+ chars)
-   - `ENCRYPTION_KEY`: AES key (44 chars base64)
+2. Set up environment variables in `.env` (see Setup section)
 
-3. Run database migrations:
+3. Run database migrations and seed data:
    ```bash
    alembic upgrade head
-   ```
-
-4. Seed initial data:
-   ```bash
    python seed.py
    ```
 
-5. Start the server:
+4. Start both servers:
    ```bash
-   uvicorn app.main:app --reload
+   python dev.py
    ```
+
+5. Open [http://localhost:3000](http://localhost:3000) for the frontend
+
+This will start both the FastAPI backend (port 8000) and React frontend (port 3000).
 
 ## Docker Deployment
 
@@ -97,6 +94,40 @@ The system follows clean architecture principles with strict separation of conce
 2. The API will be available at `http://localhost:8000`
 
 3. Database at `localhost:5432`
+
+## Frontend Setup
+
+The system includes a modern vanilla HTML/CSS/JavaScript frontend for easy management.
+
+### Features
+- **No Build Tools Required**: Pure HTML/CSS/JavaScript that runs directly in the browser
+- **Responsive Design**: Works on desktop and mobile devices
+- **Modern UI**: Clean, professional interface with smooth animations
+- **Real-time Updates**: Automatic token refresh and error handling
+- **Security**: JWT-based authentication with secure API communication
+
+### Running the Frontend
+
+The frontend is automatically served when you run `python dev.py`. It will be available at:
+
+- **Frontend UI**: http://127.0.0.1:3000
+
+### Manual Frontend Serving
+
+If you need to serve the frontend separately:
+
+```bash
+cd static
+python -m http.server 3000
+```
+
+Then open http://127.0.0.1:3000 in your browser.
+
+### Default Credentials
+- Username: `admin`
+- Password: `admin123`
+
+The frontend automatically proxies API requests to the backend running on port 8000.
 
 ## API Endpoints
 

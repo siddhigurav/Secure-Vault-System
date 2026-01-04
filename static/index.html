@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Vault System</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2L3 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-9-5z' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/><circle cx='12' cy='12' r='3' stroke='currentColor' stroke-width='2'/><path d='M12 9v6' stroke='currentColor' stroke-width='2' stroke-linecap='round'/><path d='M9 12h6' stroke='currentColor' stroke-width='2' stroke-linecap='round'/></svg>">
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="page active">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L3 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-9-5z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 9v6"/>
+                        <path d="M9 12h6"/>
+                    </svg>
+                </div>
+                <h1>Secure Vault System</h1>
+                <p>Sign in to access your secure vault</p>
+            </div>
+
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <div id="login-error" class="error-message hidden"></div>
+
+                <button type="submit" id="login-btn" class="btn btn-primary">
+                    <span class="btn-text">Sign In</span>
+                    <div class="btn-spinner hidden"></div>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <p>Default credentials: <strong>admin / admin123</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="page hidden">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L3 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-9-5z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 9v6"/>
+                        <path d="M9 12h6"/>
+                    </svg>
+                    <span>Secure Vault</span>
+                </div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a href="#" data-page="dashboard" class="active"><span class="icon">📊</span> Dashboard</a></li>
+                <li><a href="#" data-page="secrets"><span class="icon">🔑</span> Secrets</a></li>
+                <li><a href="#" data-page="users"><span class="icon">👥</span> Users</a></li>
+                <li><a href="#" data-page="roles"><span class="icon">🛡️</span> Roles</a></li>
+                <li><a href="#" data-page="policies"><span class="icon">📄</span> Policies</a></li>
+                <li><a href="#" data-page="audit"><span class="icon">📋</span> Audit</a></li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-name" id="user-name">User</div>
+                    <div class="user-role" id="user-role">Admin</div>
+                </div>
+                <button id="logout-btn" class="btn btn-secondary btn-sm">
+                    <span class="icon">🚪</span> Logout
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main id="main-content" class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page-content active">
+                <div class="page-header">
+                    <h2>Dashboard</h2>
+                    <p>Overview of your secure vault system</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🔑</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="secrets-count">0</div>
+                            <div class="stat-label">Total Secrets</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="users-count">0</div>
+                            <div class="stat-label">Active Users</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">🛡️</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="roles-count">0</div>
+                            <div class="stat-label">Roles</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">📄</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="policies-count">0</div>
+                            <div class="stat-label">Policies</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-activity">
+                    <h3>Recent Activity</h3>
+                    <div id="activity-list" class="activity-list">
+                        <p class="no-data">No recent activity</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secrets Page -->
+            <div id="secrets-page" class="page-content hidden">
+                <div class="page-header">
+                    <div class="page-header-content">
+                        <div>
+                            <h2>Secrets</h2>
+                            <p>Manage your encrypted secrets securely</p>
+                        </div>
+                        <button id="add-secret-btn" class="btn btn-primary">
+                            <span class="icon">+</span> Add Secret
+                        </button>
+                    </div>
+                </div>
+
+                <div id="secrets-error" class="error-message hidden"></div>
+
+                <!-- Add/Edit Secret Form -->
+                <div id="secret-form" class="form-container hidden">
+                    <form id="secret-form-element" class="form">
+                        <h3 id="secret-form-title">Add New Secret</h3>
+
+                        <div class="form-group">
+                            <label for="secret-name">Name</label>
+                            <input type="text" id="secret-name" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="secret-value">Value</label>
+                            <textarea id="secret-value" name="value" rows="4" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="secret-description">Description</label>
+                            <input type="text" id="secret-description" name="description">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" id="cancel-secret-btn" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Secrets List -->
+                <div id="secrets-list" class="data-list">
+                    <div class="loading">Loading secrets...</div>
+                </div>
+            </div>
+
+            <!-- Placeholder Pages -->
+            <div id="users-page" class="page-content hidden">
+                <div class="page-header">
+                    <h2>Users</h2>
+                    <p>Manage system users and their access</p>
+                </div>
+                <div class="placeholder-content">
+                    <div class="placeholder-icon">👥</div>
+                    <h3>Users Management</h3>
+                    <p>User management functionality will be implemented here.</p>
+                </div>
+            </div>
+
+            <div id="roles-page" class="page-content hidden">
+                <div class="page-header">
+                    <h2>Roles</h2>
+                    <p>Define roles and their permissions</p>
+                </div>
+                <div class="placeholder-content">
+                    <div class="placeholder-icon">🛡️</div>
+                    <h3>Roles Management</h3>
+                    <p>Role management functionality will be implemented here.</p>
+                </div>
+            </div>
+
+            <div id="policies-page" class="page-content hidden">
+                <div class="page-header">
+                    <h2>Policies</h2>
+                    <p>Configure access policies and rules</p>
+                </div>
+                <div class="placeholder-content">
+                    <div class="placeholder-icon">📄</div>
+                    <h3>Policies Management</h3>
+                    <p>Policy management functionality will be implemented here.</p>
+                </div>
+            </div>
+
+            <div id="audit-page" class="page-content hidden">
+                <div class="page-header">
+                    <h2>Audit Log</h2>
+                    <p>View system activity and audit trails</p>
+                </div>
+                <div class="placeholder-content">
+                    <div class="placeholder-icon">📋</div>
+                    <h3>Audit Logs</h3>
+                    <p>Audit log functionality will be implemented here.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

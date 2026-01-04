@@ -12,7 +12,7 @@ from app.db.session import get_db
 from app.models import User
 from app.schemas.auth import Token, TokenData, UserLogin
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/login")
 
 
 def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:
@@ -24,8 +24,8 @@ def authenticate_user(db: Session, username: str, password: str) -> Optional[Use
     return user
 
 
-def login_user(db: Session, user_login: UserLogin) -> Token:
-    user = authenticate_user(db, user_login.username, user_login.password)
+def login_user(db: Session, username: str, password: str) -> Token:
+    user = authenticate_user(db, username, password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
