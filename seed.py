@@ -20,6 +20,12 @@ from app.models import Policy, Role, RolePolicy, User, UserRole
 def seed_data():
     db: Session = SessionLocal()
     try:
+        # Check if roles already exist
+        existing_roles = db.query(Role).count()
+        if existing_roles > 0:
+            print("Data already seeded. Skipping...")
+            return
+
         # Create admin role
         admin_role = Role(name="admin", description="Administrator role")
         db.add(admin_role)
@@ -61,20 +67,6 @@ def seed_data():
         for policy in user_policies:
             role_policy = RolePolicy(role_id=user_role.id, policy_id=policy.id)
             db.add(role_policy)
-
-        # Create admin user
-        admin_user = User(
-            username="admin",
-            email="admin@example.com",
-            hashed_password=get_password_hash("admin123"),
-            is_active=True
-        )
-        db.add(admin_user)
-        db.flush()
-
-        # Assign admin role to admin user
-        user_role_rel = UserRole(user_id=admin_user.id, role_id=admin_role.id)
-        db.add(user_role_rel)
 
         db.commit()
         print("Seeding completed successfully!")

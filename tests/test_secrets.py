@@ -2,10 +2,11 @@ import pytest
 from sqlalchemy.orm import Session
 
 from app.services.secret_service import create_secret, get_secret
+from app.schemas.secret import SecretCreate
 
 
 def test_create_secret(db: Session, test_user):
-    secret_data = {"name": "test_secret", "path": "/test", "value": "secret_value"}
+    secret_data = SecretCreate(name="test_secret", path="/test", value="secret_value")
     secret = create_secret(db, secret_data, test_user.id)
     assert secret.name == "test_secret"
     assert secret.path == "/test"

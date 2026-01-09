@@ -1,7 +1,8 @@
 // API Module - Handles HTTP requests and authentication
 class API {
     constructor(baseURL = '') {
-        this.baseURL = baseURL || window.location.origin;
+        // Use backend server URL instead of current origin
+        this.baseURL = baseURL || 'http://localhost:8002';
         this.token = localStorage.getItem('accessToken');
         this.refreshToken = localStorage.getItem('refreshToken');
     }

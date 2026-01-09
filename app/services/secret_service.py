@@ -15,7 +15,7 @@ def create_secret(db: Session, secret_data: SecretCreate, created_by: int) -> Se
     if existing:
         raise ValueError("Secret path already exists")
     
-    encrypted_value = encrypt_secret(secret_data.value)
+    encrypted_value, encrypted_dek = encrypt_secret(secret_data.value)
     secret = Secret(
         name=secret_data.name,
         path=secret_data.path,
@@ -29,6 +29,7 @@ def create_secret(db: Session, secret_data: SecretCreate, created_by: int) -> Se
         secret_id=secret.id,
         version=1,
         encrypted_value=encrypted_value,
+        encrypted_dek=encrypted_dek,
         created_by=created_by,
         is_active=True
     )
@@ -59,7 +60,7 @@ def reveal_secret(db: Session, secret_id: int, user_id: int) -> SecretReveal:
     )
     if not current_version:
         raise ValueError("No active version found")
-    plaintext = decrypt_secret(current_version.encrypted_value)
+    plaintext = decrypt_secret(current_version.encrypted_value, current_version.encrypted_dek)
     return SecretReveal(
         id=secret.id,
         name=secret.name,
@@ -87,11 +88,12 @@ def rotate_secret(db: Session, secret_id: int, update_data: SecretUpdate, user_i
     
     # Create new version
     new_version_num = secret.current_version + 1
-    encrypted_value = encrypt_secret(update_data.value)
+    encrypted_value, encrypted_dek = encrypt_secret(update_data.value)
     version = SecretVersion(
         secret_id=secret.id,
         version=new_version_num,
         encrypted_value=encrypted_value,
+        encrypted_dek=encrypted_dek,
         created_by=user_id,
         is_active=True
     )

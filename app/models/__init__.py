@@ -1,5 +1,6 @@
 from .audit import AuditLog
 from .policy import Policy
+from .refresh_token import RefreshToken
 from .role import Role
 from .role_policy import RolePolicy
 from .secret import Secret, SecretVersion
@@ -15,4 +16,5 @@ __all__ = [
     "Secret",
     "SecretVersion",
     "AuditLog",
+    "RefreshToken",
 ]

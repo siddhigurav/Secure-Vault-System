@@ -22,3 +22,4 @@ class User(Base):
     roles = relationship("UserRole", back_populates="user")
     audit_logs = relationship("AuditLog", back_populates="user")
     secrets_created = relationship("Secret", back_populates="created_by_user")
+    refresh_tokens = relationship("RefreshToken", back_populates="user")

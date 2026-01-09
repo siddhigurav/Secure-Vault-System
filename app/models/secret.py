@@ -29,7 +29,8 @@ class SecretVersion(Base):
     id = Column(Integer, primary_key=True, index=True)
     secret_id = Column(Integer, ForeignKey("secrets.id"), nullable=False)
     version = Column(Integer, nullable=False)
-    encrypted_value = Column(Text, nullable=False)  # Encrypted data
+    encrypted_value = Column(Text, nullable=False)  # Encrypted data with DEK
+    encrypted_dek = Column(Text, nullable=False)    # DEK encrypted with KEK
     created_at = Column(DateTime, default=datetime.utcnow)
     created_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     is_active = Column(Boolean, default=True)
