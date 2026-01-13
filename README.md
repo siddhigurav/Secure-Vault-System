@@ -1,184 +1,434 @@
-# Secure Vault System
+# 🔒 Secure Vault System
 
-A production-grade secure vault system for managing sensitive company metadata using Python FastAPI backend and vanilla HTML/CSS/JavaScript frontend.
+Enterprise-grade secret management system with encryption, role-based access control, policy engine, and comprehensive audit logging.
 
-## Architecture
+## 🎯 Features
 
-### Clean Architecture
+- **🔐 AES-256-GCM Encryption**: Secrets encrypted at rest with unique DEKs
+- **👥 Role-Based Access Control**: Fine-grained permissions via policies
+- **📋 Policy Engine**: Conditional access with IP ranges, time windows
+- **🔍 Audit Logging**: Immutable, cryptographically-chained logs
+- **🎨 Modern UI**: Dark-themed, responsive web interface
+- **🔄 Secret Rotation**: Versioned secrets with rotation support
+- **⚡ Rate Limiting**: Protection against brute force attacks
+- **🛡️ Security Headers**: Helmet, CORS, CSP, HSTS
 
-The system follows clean architecture principles with strict separation of concerns:
+## 📋 Prerequisites
 
-- **API Layer** (`app/api/`): Request/response handling only. No business logic.
-- **Service Layer** (`app/services/`): Business logic, orchestration.
-- **Core Layer** (`app/core/`): Security, permissions, configuration.
-- **Models** (`app/models/`): SQLAlchemy domain models.
-- **Schemas** (`app/schemas/`): Pydantic validation models.
+- **Node.js** 16+ and npm
+- **PostgreSQL** 12+
+- **Git**
 
-### Security Design
+## 🚀 Quick Start
 
-#### Authentication
-- JWT-based authentication with short-lived access tokens (15 minutes) and refresh tokens (7 days).
-- Passwords hashed using Argon2.
-- Tokens invalidated on logout/refresh.
-
-#### Authorization
-- Role-Based Access Control (RBAC) with Policy-Based Authorization.
-- Authorization flow: User → Roles → Policies → Decision.
-- Policies define allowed actions (read, write, rotate, delete) on resources (secrets).
-- Deny-by-default: Access granted only when explicitly allowed by policies.
-
-#### Secret Management
-- Secrets encrypted at rest using AES-256-GCM.
-- Encryption key stored securely (in production, use HSM or KMS).
-- Secrets never stored or logged in plaintext.
-- Secret versioning for rotation.
-- Masked by default; explicit permission required to reveal.
-
-#### Audit Logging
-- Immutable audit logs for all sensitive actions.
-- Logs include: user_id, action, resource_id, timestamp, IP.
-- No secrets in logs.
-
-### Threat Model
-
-#### Threats Addressed
-- **Data Breach**: Encryption prevents plaintext exposure.
-- **Unauthorized Access**: RBAC and policies enforce access control.
-- **Insider Threats**: Audit logs track all actions.
-- **Credential Theft**: Short-lived tokens, hashed passwords.
-- **Data Tampering**: Immutable logs, versioned secrets.
-
-#### Assumptions
-- Database is secure and access-controlled.
-- Encryption keys are protected.
-- Network traffic is encrypted (HTTPS).
-- Users are authenticated via secure channels.
-
-#### Tradeoffs
-- **Performance vs Security**: Encryption/decryption adds overhead.
-- **Complexity vs Flexibility**: Policy-based auth is powerful but complex.
-- **Storage vs Auditability**: Full audit logs increase storage needs.
-- **Usability vs Security**: Masked secrets require explicit reveal actions.
-
-## Quick Start (Backend + Frontend)
-
-1. Install backend dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. Set up environment variables in `.env` (see Setup section)
-
-3. Run database migrations and seed data:
-   ```bash
-   alembic upgrade head
-   python seed.py
-   ```
-
-4. Start both servers:
-   ```bash
-   python dev.py
-   ```
-
-5. Open [http://localhost:3000](http://localhost:3000) for the frontend
-
-This will start both the FastAPI backend (port 8000) and React frontend (port 3000).
-
-## Docker Deployment
-
-1. Build and run with Docker Compose:
-   ```bash
-   docker-compose up --build
-   ```
-
-2. The API will be available at `http://localhost:8000`
-
-3. Database at `localhost:5432`
-
-## Frontend Setup
-
-The system includes a modern vanilla HTML/CSS/JavaScript frontend for easy management.
-
-### Features
-- **No Build Tools Required**: Pure HTML/CSS/JavaScript that runs directly in the browser
-- **Responsive Design**: Works on desktop and mobile devices
-- **Modern UI**: Clean, professional interface with smooth animations
-- **Real-time Updates**: Automatic token refresh and error handling
-- **Security**: JWT-based authentication with secure API communication
-
-### Running the Frontend
-
-The frontend is automatically served when you run `python dev.py`. It will be available at:
-
-- **Frontend UI**: http://127.0.0.1:3000
-
-### Manual Frontend Serving
-
-If you need to serve the frontend separately:
+### 1. Clone Repository
 
 ```bash
-cd static
-python -m http.server 3000
+git clone <repository-url>
+cd Secure-Vault-System
 ```
 
-Then open http://127.0.0.1:3000 in your browser.
+### 2. Install Dependencies
 
-### Default Credentials
-- Username: `admin`
-- Password: `admin123`
+```bash
+npm install
+```
 
-The frontend automatically proxies API requests to the backend running on port 8000.
+### 3. Configure Environment
 
-## API Endpoints
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and set:
+
+```env
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=secure_vault
+DB_USER=vault_admin
+DB_PASSWORD=your_secure_password
+
+# Encryption (CRITICAL: Generate secure keys!)
+MASTER_ENCRYPTION_KEY=<64-character-hex-string>
+JWT_SECRET=<your-jwt-secret-32-chars-minimum>
+```
+
+**Generate secure keys:**
+
+```bash
+# Master encryption key (256-bit)
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+# JWT secret
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+### 4. Setup Database
+
+Create PostgreSQL databases:
+
+```bash
+psql -U postgres
+CREATE DATABASE secure_vault;
+CREATE DATABASE vault_audit;
+\q
+```
+
+Run schema:
+
+```bash
+psql -U postgres -d secure_vault -f db/schema.sql
+psql -U postgres -d vault_audit -f db/schema.sql
+```
+
+### 5. Start Server
+
+```bash
+# Development
+npm run dev
+
+# Production
+npm start
+```
+
+Server runs on `http://localhost:3000`
+
+## 🔑 Default Credentials
+
+**Username:** `admin`  
+**Password:** `Admin@123`
+
+⚠️ **CHANGE THIS IMMEDIATELY AFTER FIRST LOGIN!**
+
+## 📚 API Documentation
 
 ### Authentication
-- `POST /api/v1/auth/login`: User login
-- `POST /api/v1/auth/refresh`: Refresh access token
 
-### Users
-- `POST /api/v1/users`: Create user
-- `GET /api/v1/users`: List users
-- `GET /api/v1/users/{id}`: Get user
-- `PUT /api/v1/users/{id}`: Update user
-- `DELETE /api/v1/users/{id}`: Delete user
+#### Register User
+```http
+POST /api/auth/register
+Content-Type: application/json
 
-### Roles
-- `POST /api/v1/roles`: Create role
-- `GET /api/v1/roles`: List roles
-- `GET /api/v1/roles/{id}`: Get role
-- `PUT /api/v1/roles/{id}`: Update role
-- `DELETE /api/v1/roles/{id}`: Delete role
+{
+  "username": "john",
+  "email": "john@example.com",
+  "password": "SecurePass123!",
+  "roles": ["developer"]
+}
+```
 
-### Policies
-- `POST /api/v1/policies`: Create policy
-- `GET /api/v1/policies`: List policies
-- `GET /api/v1/policies/{id}`: Get policy
-- `PUT /api/v1/policies/{id}`: Update policy
-- `DELETE /api/v1/policies/{id}`: Delete policy
+#### Login
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "Admin@123"
+}
+
+Response:
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": { "id": 1, "username": "admin", "roles": [...] }
+}
+```
 
 ### Secrets
-- `POST /api/v1/secrets`: Create secret
-- `GET /api/v1/secrets`: List secrets (masked)
-- `GET /api/v1/secrets/{id}`: Get secret (masked)
-- `GET /api/v1/secrets/{id}/reveal`: Reveal secret value
-- `PUT /api/v1/secrets/{id}/rotate`: Rotate secret
-- `DELETE /api/v1/secrets/{id}`: Delete secret
 
-### Audit
-- `GET /api/v1/audit/logs`: Query audit logs
+#### Create Secret
+```http
+POST /api/secrets
+Authorization: Bearer <token>
+Content-Type: application/json
 
-## Development
+{
+  "path": "prod/database/password",
+  "value": "super-secret-password",
+  "description": "Production database password",
+  "tags": ["database", "production"]
+}
+```
 
-- Use type hints everywhere.
-- Run tests: `pytest`
-- Format code: `black .`
-- Lint: `mypy .`
+#### List Secrets
+```http
+GET /api/secrets?prefix=prod&limit=50
+Authorization: Bearer <token>
+```
 
-## Production Considerations
+#### Get Secret (Masked)
+```http
+GET /api/secrets/prod/database/password
+Authorization: Bearer <token>
 
-- Use managed PostgreSQL with backups.
-- Store encryption keys in HSM/KMS.
-- Enable HTTPS.
-- Monitor audit logs.
-- Implement rate limiting.
-- Use secrets management for config values.
+Response:
+{
+  "secret": {
+    "path": "prod/database/password",
+    "value": "super-se••••••••••••••••",
+    "description": "Production database password",
+    ...
+  }
+}
+```
+
+#### Reveal Secret (Plaintext)
+```http
+GET /api/secrets/prod/database/password/reveal
+Authorization: Bearer <token>
+
+Response:
+{
+  "secret": {
+    "path": "prod/database/password",
+    "value": "super-secret-password",
+    ...
+  }
+}
+```
+
+#### Rotate Secret
+```http
+POST /api/secrets/prod/database/password/rotate
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "value": "new-super-secret-password"
+}
+```
+
+### Policies
+
+#### Create Policy
+```http
+POST /api/policies
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "dev-team-access",
+  "description": "Developers can read dev secrets",
+  "effect": "allow",
+  "roles": ["developer"],
+  "actions": ["read", "read_masked"],
+  "resources": ["dev/*", "staging/*"],
+  "conditions": {
+    "ip_range": "10.0.0.0/8"
+  }
+}
+```
+
+#### Simulate Access
+```http
+POST /api/policies/simulate
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "userId": 2,
+  "action": "read_reveal",
+  "resourcePath": "prod/stripe-api-key"
+}
+
+Response:
+{
+  "simulation": {
+    "allowed": false,
+    "reason": "No policy grants 'read_reveal' on 'prod/stripe-api-key'",
+    "policies": [...]
+  }
+}
+```
+
+### Audit Logs
+
+#### Query Logs
+```http
+GET /api/audit?action=secret_read_reveal&startDate=2024-01-01&limit=100
+Authorization: Bearer <token>
+```
+
+#### Export CSV
+```http
+GET /api/audit/export?startDate=2024-01-01
+Authorization: Bearer <token>
+```
+
+## 🏗️ Architecture
+
+```
+┌─────────────┐
+│   Browser   │
+│   (React)   │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────────────────────────┐
+│      Express API Gateway        │
+│  (Auth, Rate Limit, Security)   │
+└──────┬──────────────────┬───────┘
+       │                  │
+       ▼                  ▼
+┌──────────────┐   ┌──────────────┐
+│ Auth Service │   │Policy Engine │
+└──────────────┘   └──────────────┘
+       │                  │
+       ▼                  ▼
+┌──────────────────────────────────┐
+│       Secret Service             │
+│    (Encryption/Decryption)       │
+└──────┬───────────────────────────┘
+       │
+       ▼
+┌──────────────┐   ┌──────────────┐
+│  PostgreSQL  │   │  Audit DB    │
+│  (Secrets)   │   │ (Immutable)  │
+└──────────────┘   └──────────────┘
+```
+
+## 🔒 Security Best Practices
+
+### Production Deployment
+
+1. **Use HSM/KMS for Master Key**
+   - AWS KMS, Azure Key Vault, or Google Cloud KMS
+   - Never store master key in environment variables in production
+
+2. **Enable HTTPS**
+   - Use TLS 1.3
+   - Configure proper certificates
+
+3. **Database Security**
+   - Use separate databases for main and audit
+   - Enable PostgreSQL SSL connections
+   - Restrict network access
+
+4. **Monitoring**
+   - Set up alerts for failed login attempts
+   - Monitor audit log anomalies
+   - Track secret access patterns
+
+5. **Backup Strategy**
+   - Regular encrypted backups
+   - Test restore procedures
+   - Store backups off-site
+
+### Key Rotation
+
+Rotate master encryption key every 90 days:
+
+```bash
+# Generate new key
+NEW_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+
+# Update .env with NEW_KEY
+# Restart application
+# Old secrets remain accessible (DEKs re-encrypted automatically)
+```
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+npm test
+
+# Test specific service
+npm run test:encryption
+npm run test:policies
+npm run test:audit
+```
+
+## 📊 Monitoring
+
+### Health Check
+
+```http
+GET /health
+
+Response:
+{
+  "status": "healthy",
+  "timestamp": "2024-01-13T14:30:00.000Z",
+  "uptime": 3600
+}
+```
+
+### Audit Log Verification
+
+```http
+GET /api/audit/verify
+Authorization: Bearer <token>
+
+Response:
+{
+  "verification": {
+    "valid": true,
+    "message": "Verified 1000 audit log entries"
+  }
+}
+```
+
+## 🐛 Troubleshooting
+
+### Database Connection Errors
+
+```bash
+# Check PostgreSQL is running
+sudo systemctl status postgresql
+
+# Test connection
+psql -U vault_admin -d secure_vault -c "SELECT 1;"
+```
+
+### Encryption Errors
+
+```bash
+# Verify master key length (must be 64 hex characters)
+echo $MASTER_ENCRYPTION_KEY | wc -c
+# Should output: 65 (64 chars + newline)
+```
+
+### JWT Token Issues
+
+```bash
+# Verify JWT secret is set
+echo $JWT_SECRET
+
+# Check token expiry in .env
+JWT_EXPIRY=8h
+```
+
+## 📝 License
+
+MIT License - See LICENSE file for details
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
+
+## 📞 Support
+
+For issues and questions:
+- Open an issue on GitHub
+- Contact: security@example.com
+
+## ⚠️ Disclaimer
+
+This system is designed for internal enterprise use. While it implements industry-standard security practices, it should be:
+- Reviewed by security professionals before production use
+- Deployed in a secure network environment
+- Regularly updated and monitored
+- Part of a comprehensive security strategy
+
+**Not a replacement for:**
+- Network security
+- Application security
+- Physical security
+- Security awareness training

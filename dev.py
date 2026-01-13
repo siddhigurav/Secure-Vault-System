@@ -38,13 +38,20 @@ def run_frontend():
     # Change to frontend directory
     os.chdir(frontend_dir)
 
-    class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+    class NoCacheHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         def log_message(self, format, *args):
             # Suppress log messages
             pass
+        
+        def end_headers(self):
+            # Add no-cache headers to prevent browser caching
+            self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Expires', '0')
+            super().end_headers()
 
     def serve_frontend():
-        with socketserver.TCPServer(("", 3000), QuietHTTPRequestHandler) as httpd:
+        with socketserver.TCPServer(("", 3000), NoCacheHTTPRequestHandler) as httpd:
             print("🎨 Frontend server running on http://127.0.0.1:3000")
             httpd.serve_forever()
 

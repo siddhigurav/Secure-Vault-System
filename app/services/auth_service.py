@@ -12,7 +12,7 @@ from app.db.session import get_db
 from app.models import User, RefreshToken
 from app.schemas.auth import Token, TokenData, UserLogin
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/login")
 
 
 def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:

@@ -39,6 +39,13 @@ def create_user(
     return UserRead.from_orm(user)
 
 
+@router.get("/users/me", response_model=UserRead)
+def get_current_user_info(
+    current_user: User = Depends(get_current_active_user)
+):
+    return UserRead.from_orm(current_user)
+
+
 @router.get("/users", response_model=List[UserRead])
 def list_users(
     db: Session = Depends(get_db),

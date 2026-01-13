@@ -2,7 +2,7 @@
 class API {
     constructor(baseURL = '') {
         // Use backend server URL instead of current origin
-        this.baseURL = baseURL || 'http://localhost:8002';
+        this.baseURL = baseURL || 'http://localhost:8000';
         this.token = localStorage.getItem('accessToken');
         this.refreshToken = localStorage.getItem('refreshToken');
     }

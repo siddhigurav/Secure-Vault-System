@@ -16,7 +16,7 @@ def main():
         print("🚀 Starting Secure Vault System...")
 
         uvicorn.run(
-            "app.main_minimal:app",
+            "app.main:app",
             host="127.0.0.1",
             port=8002,  # Changed from 8001 to 8002
             reload=False,

@@ -25,7 +25,7 @@ class Auth {
     // Login user
     async login(username, password) {
         try {
-            UI.showLoading();
+            ui.showLoading();
 
             const data = await api.login(username, password);
 
@@ -34,12 +34,12 @@ class Auth {
             this.user = payload;
             this.isAuthenticated = true;
 
-            UI.hideLoading();
-            UI.showApp();
+            ui.hideLoading();
+            ui.showApp();
 
             return { success: true };
         } catch (error) {
-            UI.hideLoading();
+            ui.hideLoading();
             return { success: false, error: error.message };
         }
     }
@@ -49,7 +49,7 @@ class Auth {
         api.logout();
         this.user = null;
         this.isAuthenticated = false;
-        UI.showLogin();
+        ui.showLogin();
     }
 
     // Check if user is authenticated
